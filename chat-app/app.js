@@ -40,13 +40,13 @@ wsServer.on('connection', function(ws) {
         if(roomFound === false){
             // no rooms available, creating new one
             console.log("Creating new room, none rooms available");
-            let newRoom = new Room(new User(con, "test"), 2, con.id);
+            let newRoom = new Room(new User(con, "test"), 4, con.id);
             currentRooms.set(newRoom.getId(), newRoom);
         }
     }else{
         //no rooms running, creating one
         console.log("Creating new room, none rooms found");
-        let newRoom = new Room(new User(con, "test"), 2, con.id);
+        let newRoom = new Room(new User(con, "test"), 4, con.id);
         currentRooms.set(newRoom.getId(), newRoom);
     }
 });

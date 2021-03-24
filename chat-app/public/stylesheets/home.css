@@ -1,0 +1,11 @@
+#menu{
+    position: absolute;
+    top:50%;
+    right: 50%;
+}
+
+h1{
+    font-size:5em;
+    text-align: center;
+    margin: auto;
+}

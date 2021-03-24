@@ -1,0 +1,19 @@
+#sendMessage{
+    top: 40em;
+    right:50em;
+}
+
+#history{
+    right:50em;
+    top:20em;
+}
+
+#chat{
+    position: absolute;
+    padding: 1em;
+    bottom: 50%;
+    right:50%;
+    border: 1em;
+    border-color:indianred;
+    border-style:groove;
+}
