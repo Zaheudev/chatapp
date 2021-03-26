@@ -6,6 +6,7 @@ const path = require("path");
 
 const Room = require("./room.js");
 const User = require("./user.js");
+const Message = require("./message.js")
 
 const port = process.argv[2];
 const app = express();  
@@ -32,23 +33,38 @@ wsServer.on('connection', function(ws) {
         for(const [id, room] of currentRooms){
             if(room.getUsers.length === 1 || room.getUsers().length != room.getSlots()){
                 //game found
-                console.log("Game Found, joining room " + room.getHost().getName());
                 roomFound = true;
                 room.addUserToRoom(new User(con, "test"));
+                console.log("Game Found, joining room " + room.getUsers().length);
             }
         }
         if(roomFound === false){
             // no rooms available, creating new one
-            console.log("Creating new room, none rooms available");
             let newRoom = new Room(new User(con, "test"), 4, con.id);
             currentRooms.set(newRoom.getId(), newRoom);
+            console.log("Creating new room, none rooms available " + newRoom.getUsers().length);
         }
     }else{
         //no rooms running, creating one
         console.log("Creating new room, none rooms found");
         let newRoom = new Room(new User(con, "test"), 4, con.id);
         currentRooms.set(newRoom.getId(), newRoom);
+        console.log("Creating new room, none rooms available " + newRoom.getUsers().length);
     }
+
+    ws.on("message", function(message) {
+        //let clientMessage represents the entire message
+        let clientMessage = JSON.parse(message);
+    
+        //use the message type and do something with it's data  e.g: "join" or "createRoom"
+        switch(message.type){
+            case "e.g":
+                //let msg represents the data of the message
+                let msg = clientMessage.data;
+                break;
+        }
+    });
+
 });
 
 http.createServer(app).listen(port);
