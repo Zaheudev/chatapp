@@ -1,16 +1,21 @@
-function Room(host, slots, id){
+function Room(host, slots, code, acces){
     this.users = new Array();
-    this.id = id;
+    this.code = code;
     this.host = host;
     this.slots = slots;
+    this.acces = acces;
     this.users.push(this.host);
 
     this.addUserToRoom = function(user){
         this.users.push(user);
     }
 
-    this.getId = function(){
-        return this.id;
+    this.getAvailableSlots = function(){
+        return this.getSlots() - this.getUsers().length;
+    }
+
+    this.getCode = function(){
+        return this.code;
     }
 
     this.getHost = function(){
@@ -23,6 +28,14 @@ function Room(host, slots, id){
 
     this.getUsers = function(){
         return this.users;
+    }
+
+    this.getAcces = function(){
+        return this.acces
+    }
+
+    this.setAcces = function(boolean){
+        this.acces = boolean;
     }
 }
 
