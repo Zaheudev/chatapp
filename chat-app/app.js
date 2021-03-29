@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require("http");
 const ws = require("ws");
-const indexRouter = require("./routes/index");
+const indexRouter = require("./routes/index.js");
 const path = require("path");
 
 const Room = require("./room.js");
@@ -27,61 +27,55 @@ wsServer.on('connection', function(ws) {
     let con = ws;
     con.id = connectionId++;
 
-    // if(currentRooms != 0){
-    //     //looping through the map until finds a room
-    //     let roomFound = false;
-    //     for(const [id, room] of currentRooms){
-    //         if(room.getUsers.length === 1 || room.getUsers().length != room.getSlots()){
-    //             //room found
-    //             roomFound = true;
-    //             room.addUserToRoom(new User(con, "test"));
-    //             console.log("Game Found, joining room " + room.getUsers().length);
-    //         }
-    //     }
-    //     if(roomFound === false){
-    //         // no rooms available, creating new one
-    //         let newRoom = new Room(new User(con, "test"), 4, con.id);
-    //         currentRooms.set(newRoom.getId(), newRoom);
-    //         console.log("Creating new room, none rooms available " + newRoom.getUsers().length);
-    //     }
-    // }else{
-    //     //no rooms running, creating one
-    //     console.log("Creating new room, none rooms found");
-    //     let newRoom = new Room(new User(con, "test"), 4, con.id);
-    //     currentRooms.set(newRoom.getId(), newRoom);
-    //     console.log("Creating new room, none rooms available " + newRoom.getUsers().length);
-    // }
-
     ws.on("message", function(message) {
         let clientMessage = JSON.parse(message);
         console.log(clientMessage.data);
         let msg = clientMessage.data;
 
         switch(clientMessage.type){
-            case "joinRoomCommand":
+            case "askCreateRoom":
+                let code = makeCode(6);
+                con.send(JSON.stringify(new Message("VALID_CRC", {username: msg.username, code: code, slots: msg.slots, acces: msg.acces})));
+                break;
+            case "askJoinRoom":
+                let roomFound;
+
                 //looping thorugh the map until finds the room with the corresponding code
                 for(const [code, room] of currentRooms){
-                    if(room.getCode() === msg.code && room.getAvailableSlots() != 0){
-                        room.addUserToRoom(new User(con, msg.username));
-                        console.log("joined room with code: " + code + " users: " + room.getUsers().length);
-                        console.log("remaining slots: " + room.getAvailableSlots());
+                    if(code === msg.code && room.getAvailableSlots() != 0){
+                        con.send(JSON.stringify(new Message("VALID_JRC", {username: msg.username, code: msg.code, slots: room.getSlotsFormat()})));
+                        roomFound = true;
                     }
-                    console.log("wrong code or not enough space");
+                }
+                if(!roomFound){
+                    console.log("failed to find the room with code " + msg.code);
                 }
                 break;
+            case "joinRoomCommand":
+                currentRooms.get(msg.code).addUserToRoom(new User(con, msg.username));
+                con.send(JSON.stringify(new Message("JOIN_JRC")));
+                console.log("joined room with code: " + msg.code + " users: " + currentRooms.get(msg.code).getUsers().length);
+                console.log("remaining slots: " + currentRooms.get(msg.code).getAvailableSlots());
+                break;
             case "createRoomCommand":
-                let newRoom = new Room(new User(con, msg.username), msg.slots, makeCode(6), msg.acces);
+                let newRoom = new Room(new User(con, msg.username), msg.slots, msg.code, msg.acces);
                 currentRooms.set(newRoom.getCode(), newRoom);
-                console.log("Room created with code " + `and setted acces to ${newRoom.getAcces() ? "public" : "private"}` 
-                    + newRoom.getCode() + ", the host is " + newRoom.getHost().getName());
+                console.log("Room created with code " + newRoom.getCode() + ` and setted acces to ${newRoom.getAccesFormat()} ` 
+                     + ", the host is " + newRoom.getHost().getName());
+                con.send(JSON.stringify(new Message("JOIN_CRC")));
                 break;
             case "joinRandomRoomCommand":
                 if(currentRooms != 0){
                     for(const [code, room] of currentRooms){
-                        if(room.getPublic() && room.getAvailableSlots() != 0){
-                            room.addUserToRoom(new User(con, msg));
-                            console.log("joined room with code: " + code + " users: " + room.getUsers().length);
-                            console.log("remaining slots: " + room.getAvailableSlots());
+                        if(room.getAcces() && room.getAvailableSlots() != 0){
+                            if(msg.ready){
+                                room.addUserToRoom(new User(con, msg.username));
+                                console.log("joined room with code: " + code + " users: " + room.getUsers().length);
+                                console.log("remaining slots: " + room.getAvailableSlots());
+                                con.send(JSON.stringify(new Message("JOIN_JRC")));
+                            }else {
+                                con.send(JSON.stringify(new Message("VALID_JRRC", {username: msg.username, code: code, slots: room.getSlotsFormat()})));
+                            }
                         }
                     }
                 }
@@ -94,7 +88,7 @@ wsServer.on('connection', function(ws) {
 
 function makeCode(length) {
     var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     var charactersLength = characters.length;
     for ( var i = 0; i < length; i++ ) {
        result += characters.charAt(Math.floor(Math.random() * charactersLength));

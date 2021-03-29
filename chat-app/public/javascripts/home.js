@@ -19,7 +19,7 @@ joinRoomButton.addEventListener('click', (e) =>{
         joinRoomDialog.querySelector(".submitInput").addEventListener('click', (e) =>{
             username = joinRoomDialog.querySelector(".usernameField").value;
             code = joinRoomDialog.querySelector(".codeField").value;
-            client.send(JSON.stringify(new Message("joinRoomCommand", {username: username, code: code})));
+            client.send(JSON.stringify(new Message("askJoinRoom", {username: username, code: code, ready: false})));
         });
         joinRoomDialog.querySelector(".backButton").addEventListener('click', (e) =>{
             joinRoomDialog.style = "display: none;";
@@ -39,7 +39,7 @@ joinRandomRoomButton.addEventListener('click', (e) =>{
 
         joinRandomRoomDialog.querySelector(".submitInput").addEventListener('click', (e) =>{
             username = joinRandomRoomDialog.querySelector(".usernameField").value;
-            client.send(JSON.stringify(new Message("joinRandomRoomCommand", username)));
+            client.send(JSON.stringify(new Message("askJoinRandomRoom", {username: username, ready: false})));
         });
 
         joinRandomRoomDialog.querySelector(".backButton").addEventListener('click', (e) =>{
@@ -63,7 +63,7 @@ createRoomButton.addEventListener('click', (e) =>{
             username = createRoomDialog.querySelector(".usernameField").value;
             slots = createRoomDialog.querySelector(".slotsField").value;
             acces = createRoomDialog.querySelector(".checkboxField").checked;
-            client.send(JSON.stringify(new Message("createRoomCommand", {username: username, slots: slots, acces: acces})));
+            client.send(JSON.stringify(new Message("askCreateRoom", {username: username, slots: slots, acces: acces, ready: false})));
         });
         createRoomDialog.querySelector(".backButton").addEventListener('click', (e) => {
             createRoomDialog.style = "display: none";

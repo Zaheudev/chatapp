@@ -14,6 +14,14 @@ function Room(host, slots, code, acces){
         return this.getSlots() - this.getUsers().length;
     }
 
+    this.getSlotsFormat = function(){
+        return this.getUsers().length + "/" + this.getSlots();  
+    }
+
+    this.getAccesFormat = function(){
+        return this.getAcces() ? "public" : "private"
+    }
+
     this.getCode = function(){
         return this.code;
     }

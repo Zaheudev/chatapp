@@ -14,39 +14,71 @@
             <button id="createRoomButton">CREATE ROOM</button>
         </section>
 
-        <div id="createRoomDialog" style="display: none;">
-            <form action="/room" method="GET">
-                <form action="/room" method="GET">
-                    <label for="usernameField">Username:</label><br>
-                    <input class="usernameField" type="text"><br>
-                    <label for="slotsField">Slots:</label><br>
-                    <input class="slotsField" type="number" min="2"><br>
-                    <label for="checkboxField">Public:</label>
-                    <input class="checkboxField" type="checkbox"><br>
-                    <button class="submitInput" type="submit">CREATE ROOM!</button>
-                    <button type="button" class="backButton">BACK</button>
-            </form>
-        </div>
+        <section id="dialogs">
+            <div id="createRoomDialog" style="display: none;">
+                <label for="usernameField">Username:</label><br>
+                <input class="usernameField" type="text"><br>
+                <label for="slotsField">Slots:</label><br>
+                <input class="slotsField" type="number" min="2"><br>
+                <label for="checkboxField">Public:</label>
+                <input class="checkboxField" type="checkbox"><br>
+                <button class="submitInput" type="button">CREATE ROOM!</button>
+                <button type="button" class="backButton">BACK</button>
+            </div >
 
-        <div id="joinRoomDialog" style="display: none;">
-            <form action="/room" method="GET">
+            <div id="createRoomValid" style="display: none;">
+                <form action="/room" method="GET">
+                    <label for="details">Details of the room that will be created:</label><br>
+                    <div id="details">
+                        <p class="code"></p>
+                        <p class="slots"></p>
+                        <p class="acces"></p>
+                    </div>
+                    <input class="Yes" type="submit" value="CREATE">
+                    <input class="No" type="button" value="BACK">
+                </form>
+            </div>
+
+            <div id="joinRoomDialog" style="display: none;">
                 <label for="usernameField">Username:</label><br>
                 <input class="usernameField" type="text"><br>
                 <label for="codeField">Code:</label><br>
                 <input class="codeField" type="text"><br>
-                <button class="submitInput" type="submit">JOIN!</button>
+                <button class="submitInput" type="button">JOIN!</button>
                 <button type="button" class="backButton">BACK</button>
-            </form>
-        </div>
+            </div>
+            
+            <div id="joinRoomValid" style="display: none;">
+                <form action="/room" method="GET">
+                    <label for="details">Details of the room:</label><br>
+                    <div id="details">
+                        <p class="code"></p>
+                        <p class="slots"></p>
+                    </div>
+                    <input class="Yes" type="submit" value="JOIN">
+                    <input class="No" type="button" value="BACK">
+                </form>
+            </div>
 
-        <div id="joinRandomRoomDialog" style="display: none;">
-            <form action="/room" method="GET">
+            <div id="joinRandomRoomDialog" style="display: none;">
                 <label for="usernameField">Username:</label><br>
                 <input class="usernameField" type="text"><br>
                 <button class="submitInput" type="submit">JOIN!</button>
                 <button type="button" class="backButton">BACK</button>
-            </form>
-        </div>
+            </div>
+
+            <div id="joinRandomRoomValid" style="display: none;">
+                <form action="/room" method="GET">
+                    <label for="details">Details of Room:</label><br>
+                    <div id="details">
+                        <p class="code"></p>
+                        <p class="slots"></p>
+                    </div>
+                    <input class="Yes" type="submit" value="join">
+                    <input class="No" type="button" value="back">
+                </form>
+            </div>
+        </section>
 
     </body>
     <script type="text/javascript" src="./javascripts/home.js"></script>
