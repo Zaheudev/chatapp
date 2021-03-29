@@ -15,18 +15,16 @@ function resolveMsg(msg){
         case "VALID_CRC":
             console.log(msg.type);
             let createRoomValid = document.querySelector("#createRoomValid");
-            createRoomDialog.style = "display: none;";
-            createRoomValid.style = "display: block;";
+            dialogDisable(createRoomDialog, createRoomValid);
             createRoomValid.querySelector(".code").innerHTML = "Code: " + msg.data.code;
             createRoomValid.querySelector(".slots").innerHTML = "Slots: " + msg.data.slots;
-            createRoomValid.querySelector(".acces").innerHTML = "Acces: " + msg.data.acces;
+            createRoomValid.querySelector(".acces").innerHTML = `Acces: ${msg.data.acces ? "public" : "private"}`;
             addSubmitListener(createRoomValid, "createRoomCommand", msg.data);
             break;
         case "VALID_JRC":
             console.log(msg.type);
             let joinRoomValid = document.querySelector("#joinRoomValid");
-            joinRoomDialog.style = "display: none;";
-            joinRoomValid.style = "display: block;";
+            dialogDisable(joinRoomDialog, joinRoomValid);
             joinRoomValid.querySelector(".code").innerHTML = "Code: " + msg.data.code;
             joinRoomValid.querySelector(".slots").innerHTML = "Slots: " + msg.data.slots;
             addSubmitListener(joinRoomValid, "joinRoomCommand", msg.data);
@@ -34,8 +32,10 @@ function resolveMsg(msg){
         case "VALID_JRRC":
             console.log(msg.type);
             let joinRandomRoomValid = document.querySelector("#joinRandomRoomValid");
-            joinRandomRoomDialog.style = "display: none;";
-            joinRandomRoomValid.style = "display: block;";
+            dialogDisable(joinRandomRoomDialog, joinRandomRoomValid);
+            joinRandomRoomValid.querySelector(".code").innerHTML = "Code: " + msg.data.code;
+            joinRandomRoomValid.querySelector(".slots").innerHTML = "Slots: " + msg.data.slots;
+            addSubmitListener(joinRandomRoomValid, "joinRandomRoomCommand", msg.data);
             break;
     }
 }
@@ -44,4 +44,9 @@ function addSubmitListener(dialog, type, data){
     dialog.querySelector(".Yes").addEventListener('click', (e) =>{
         client.send(JSON.stringify(new Message(type, data)));
     });
+}
+
+function dialogDisable(dialog1, dialog2){
+    dialog1.style = "display: none;";
+    dialog2.style = "display: block;";
 }

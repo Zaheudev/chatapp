@@ -19,7 +19,7 @@ function Room(host, slots, code, acces){
     }
 
     this.getAccesFormat = function(){
-        return this.getAcces() ? "public" : "private"
+        return this.acces ? "public" : "private";
     }
 
     this.getCode = function(){

@@ -22,6 +22,8 @@ const wsServer = new ws.Server({port:8080});
 
 var connectionId = 0;
 var currentRooms = new Map();
+var publicRooms = new Map();
+var users = new Map();
 
 wsServer.on('connection', function(ws) {
     let con = ws;
@@ -51,6 +53,14 @@ wsServer.on('connection', function(ws) {
                     console.log("failed to find the room with code " + msg.code);
                 }
                 break;
+            case "askJoinRandomRoom":
+                if(publicRooms.size != 0){
+                    let randRoom = choiceRandomRoom(publicRooms);
+                    con.send(JSON.stringify(new Message("VALID_JRRC", {username: msg.username, code: randRoom.getCode(), slots: randRoom.getSlotsFormat()})));
+                }else{
+                    console.log("no rooms available");  
+                }
+                break;
             case "joinRoomCommand":
                 currentRooms.get(msg.code).addUserToRoom(new User(con, msg.username));
                 con.send(JSON.stringify(new Message("JOIN_JRC")));
@@ -60,26 +70,19 @@ wsServer.on('connection', function(ws) {
             case "createRoomCommand":
                 let newRoom = new Room(new User(con, msg.username), msg.slots, msg.code, msg.acces);
                 currentRooms.set(newRoom.getCode(), newRoom);
+                if(msg.acces){
+                    publicRooms.set(newRoom.code, newRoom);
+                }
                 console.log("Room created with code " + newRoom.getCode() + ` and setted acces to ${newRoom.getAccesFormat()} ` 
                      + ", the host is " + newRoom.getHost().getName());
                 con.send(JSON.stringify(new Message("JOIN_CRC")));
+
                 break;
             case "joinRandomRoomCommand":
-                if(currentRooms != 0){
-                    for(const [code, room] of currentRooms){
-                        if(room.getAcces() && room.getAvailableSlots() != 0){
-                            if(msg.ready){
-                                room.addUserToRoom(new User(con, msg.username));
-                                console.log("joined room with code: " + code + " users: " + room.getUsers().length);
-                                console.log("remaining slots: " + room.getAvailableSlots());
-                                con.send(JSON.stringify(new Message("JOIN_JRC")));
-                            }else {
-                                con.send(JSON.stringify(new Message("VALID_JRRC", {username: msg.username, code: code, slots: room.getSlotsFormat()})));
-                            }
-                        }
-                    }
-                }
-                console.log("no rooms available, create a room or wait for available rooms");
+                publicRooms.get(msg.code).addUserToRoom(new User(con, msg.username));
+                console.log("joined room with code: " + msg.code + " users: " + publicRooms.get(msg.code).getUsers().length);
+                console.log("remaining slots: " + publicRooms.get(msg.code).getAvailableSlots());
+                con.send(JSON.stringify(new Message("JOIN_JRRC")));
                 break;
         }
     });
@@ -88,13 +91,26 @@ wsServer.on('connection', function(ws) {
 
 function makeCode(length) {
     var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890123456789';
     var charactersLength = characters.length;
     for ( var i = 0; i < length; i++ ) {
        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
- }
+}
+
+function choiceRandomRoom(map){
+    let codes = new Array();
+    for(const [code, room] of map){
+        if(room.getAvailableSlots() != 0){
+            codes.push(code);
+        }
+    }
+
+    let size = Math.floor(Math.random() * codes.length);
+    let result = map.get(codes[size]);
+    return result;
+}
 
 http.createServer(app).listen(port);
 console.log("Server started on port " + port);
