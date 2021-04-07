@@ -25,9 +25,14 @@ var currentRooms = new Map();
 var publicRooms = new Map();
 var users = new Map();
 
+var tempCode = null;
+var tempUser = null;
+
 wsServer.on('connection', function(ws) {
     let con = ws;
     con.id = connectionId++;
+
+    console.log(con.id + " connected");
 
     ws.on("message", function(message) {
         let clientMessage = JSON.parse(message);
@@ -56,35 +61,59 @@ wsServer.on('connection', function(ws) {
             case "askJoinRandomRoom":
                 if(publicRooms.size != 0){
                     let randRoom = choiceRandomRoom(publicRooms);
-                    con.send(JSON.stringify(new Message("VALID_JRRC", {username: msg.username, code: randRoom.getCode(), slots: randRoom.getSlotsFormat()})));
+                    if(randRoom != null){
+                        con.send(JSON.stringify(new Message("VALID_JRRC", {username: msg.username, code: randRoom.getCode(), slots: randRoom.getSlotsFormat()})));
+                    }else{
+                        console.log("no rooms available");
+                    }
                 }else{
                     console.log("no rooms available");  
                 }
                 break;
             case "joinRoomCommand":
-                currentRooms.get(msg.code).addUserToRoom(new User(con, msg.username));
-                con.send(JSON.stringify(new Message("JOIN_JRC")));
+                let newUserjr = new User(con, msg.username, con.id, msg.code);
+                currentRooms.get(msg.code).addUserToRoom(newUserjr);
+                users.set(newUserjr.getId(), newUserjr);
                 console.log("joined room with code: " + msg.code + " users: " + currentRooms.get(msg.code).getUsers().length);
                 console.log("remaining slots: " + currentRooms.get(msg.code).getAvailableSlots());
+                tempCode = msg.code;
+                tempUser = newUserjr;
+                con.send(JSON.stringify(new Message("JOIN_JRC", newUserjr)));
                 break;
             case "createRoomCommand":
-                let newRoom = new Room(new User(con, msg.username), msg.slots, msg.code, msg.acces);
+                let newHost = new User(con, msg.username, con.id, msg.code);
+                let newRoom = new Room(newHost, msg.slots, msg.code, msg.acces);
+                users.set(newHost.getId(), newHost)
                 currentRooms.set(newRoom.getCode(), newRoom);
+                tempCode = msg.code;
+                tempUser = newHost;
                 if(msg.acces){
                     publicRooms.set(newRoom.code, newRoom);
                 }
                 console.log("Room created with code " + newRoom.getCode() + ` and setted acces to ${newRoom.getAccesFormat()} ` 
                      + ", the host is " + newRoom.getHost().getName());
-                con.send(JSON.stringify(new Message("JOIN_CRC")));
+                con.send(JSON.stringify(new Message("JOIN_CRC", newHost)));
 
                 break;
             case "joinRandomRoomCommand":
-                publicRooms.get(msg.code).addUserToRoom(new User(con, msg.username));
+                let newUserjrr = new User(con, msg.username, con.id, msg.code);
+                publicRooms.get(msg.code).addUserToRoom(newUserjrr);
+                users.set(newUserjrr.getId(), newUserjrr);
+                tempCode = msg.code;
+                tempUser = newUserjrr;
+                con.send(JSON.stringify(new Message("JOIN_JRRC", newUserjrr)));
                 console.log("joined room with code: " + msg.code + " users: " + publicRooms.get(msg.code).getUsers().length);
                 console.log("remaining slots: " + publicRooms.get(msg.code).getAvailableSlots());
-                con.send(JSON.stringify(new Message("JOIN_JRRC")));
                 break;
+            case "joined":
+                users.get(tempUser.getId()).setWs(con);
+                con.send(JSON.stringify(new Message("GET_DATA", currentRooms.get(tempCode))))
+                console.log("new id: " + tempUser.getWs().id);
         }
+    });
+
+    ws.on("close", function(code){
+        console.log(con.id + " DISCONNECTED");
     });
 
 });

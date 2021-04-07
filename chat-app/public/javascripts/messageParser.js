@@ -5,6 +5,7 @@ function Message (type, data) {
     this.data = data;
 }
 
+
 client.onmessage = function (event) {
     let msg = JSON.parse(event.data);
     resolveMsg(msg);
@@ -37,6 +38,18 @@ function resolveMsg(msg){
             joinRandomRoomValid.querySelector(".slots").innerHTML = "Slots: " + msg.data.slots;
             addSubmitListener(joinRandomRoomValid, "joinRandomRoomCommand", msg.data);
             break;
+        case "JOIN_JRC":
+            console.log(msg.type);
+            break;
+        case "JOIN_CRC":
+            console.log(msg.type);
+            break;
+        case "JOIN_JRRC":
+            console.log(msg.type);
+            break;
+        case "GET_DATA":
+            console.log(msg.type);
+            console.log(msg.data);
     }
 }
 

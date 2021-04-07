@@ -4,6 +4,11 @@
     right: 50%;
 }
 
+body{
+    background-color: black;
+    color: white;
+}
+
 h1{
     font-size:5em;
     text-align: center;

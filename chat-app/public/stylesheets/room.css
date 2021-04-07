@@ -8,6 +8,11 @@
     top:20em;
 }
 
+body{
+    background-color: black;
+    color: white;
+}
+
 #chat{
     position: absolute;
     padding: 1em;
