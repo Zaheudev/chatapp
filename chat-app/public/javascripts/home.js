@@ -19,7 +19,7 @@ joinRoomButton.addEventListener('click', (e) =>{
         joinRoomDialog.querySelector(".submitInput").addEventListener('click', (e) =>{
             username = joinRoomDialog.querySelector(".usernameField").value;
             code = joinRoomDialog.querySelector(".codeField").value;
-            client.send(JSON.stringify(new Message("askJoinRoom", {username: username, code: code, ready: false})));
+            client.send(JSON.stringify(new Message("askJoinRoom", {username: username, code: code})));
         });
         joinRoomDialog.querySelector(".backButton").addEventListener('click', (e) =>{
             joinRoomDialog.style = "display: none;";
@@ -39,7 +39,7 @@ joinRandomRoomButton.addEventListener('click', (e) =>{
 
         joinRandomRoomDialog.querySelector(".submitInput").addEventListener('click', (e) =>{
             username = joinRandomRoomDialog.querySelector(".usernameField").value;
-            client.send(JSON.stringify(new Message("askJoinRandomRoom", username)));
+            client.send(JSON.stringify(new Message("askJoinRandomRoom", {username: username})));
         });
 
         joinRandomRoomDialog.querySelector(".backButton").addEventListener('click', (e) =>{

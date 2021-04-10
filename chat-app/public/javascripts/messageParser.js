@@ -12,6 +12,8 @@ client.onmessage = function (event) {
 }
 
 function resolveMsg(msg){
+    console.log(msg.data);
+    let solvedMsg = msg.data;
     switch(msg.type){
         case "VALID_CRC":
             console.log(msg.type);
@@ -48,9 +50,22 @@ function resolveMsg(msg){
             console.log(msg.type);
             break;
         case "GET_DATA":
-            console.log(msg.type);
-            console.log(msg.data);
-    }
+            const getHost = function(){
+                let host;
+                solvedMsg.users.forEach(usr => {
+                    if(usr.role === "host") {
+                        host = usr;
+                    }
+                });
+                return host;
+            }
+            document.querySelector("#code").innerHTML = `CODE: ${solvedMsg.code}`;
+            document.querySelector("#acces").innerHTML = `ACCES: ${solvedMsg.acces ? "public" : "private"}`.toUpperCase();
+            document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.users.length}/${solvedMsg.slots}`;
+            document.querySelector("#host").innerHTML = `HOST: ${getHost().name}`;
+            break;
+        }
+
 }
 
 function addSubmitListener(dialog, type, data){
