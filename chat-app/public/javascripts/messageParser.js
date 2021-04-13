@@ -5,6 +5,8 @@ function Message (type, data) {
     this.data = data;
 }
 
+var realusr = null;
+var roomCode = null;
 
 client.onmessage = function (event) {
     let msg = JSON.parse(event.data);
@@ -12,6 +14,7 @@ client.onmessage = function (event) {
 }
 
 function resolveMsg(msg){
+    console.log(msg.type);
     console.log(msg.data);
     let solvedMsg = msg.data;
     switch(msg.type){
@@ -52,17 +55,25 @@ function resolveMsg(msg){
         case "GET_DATA":
             const getHost = function(){
                 let host;
-                solvedMsg.users.forEach(usr => {
+                solvedMsg.room.users.forEach(usr => {
                     if(usr.role === "host") {
                         host = usr;
                     }
                 });
                 return host;
             }
-            document.querySelector("#code").innerHTML = `CODE: ${solvedMsg.code}`;
-            document.querySelector("#acces").innerHTML = `ACCES: ${solvedMsg.acces ? "public" : "private"}`.toUpperCase();
-            document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.users.length}/${solvedMsg.slots}`;
+            document.querySelector("#code").innerHTML = `CODE: ${solvedMsg.room.code}`;
+            document.querySelector("#acces").innerHTML = `ACCES: ${solvedMsg.room.acces ? "public" : "private"}`.toUpperCase();
+            document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.room.users.length}/${solvedMsg.room.slots}`;
             document.querySelector("#host").innerHTML = `HOST: ${getHost().name}`;
+            realusr = solvedMsg.username;
+            roomCode = solvedMsg.room.code;
+            break;
+        case "VALID_MSG":
+            let node = document.createElement("p");  
+            let msgNode = `${solvedMsg.username}: ${solvedMsg.text}`
+            node.append(msgNode);
+            document.querySelector("#history").append(node)
             break;
         }
 
