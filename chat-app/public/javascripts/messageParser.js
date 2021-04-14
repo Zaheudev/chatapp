@@ -55,25 +55,27 @@ function resolveMsg(msg){
         case "GET_DATA":
             const getHost = function(){
                 let host;
-                solvedMsg.room.users.forEach(usr => {
+                solvedMsg.users.forEach(usr => {
                     if(usr.role === "host") {
                         host = usr;
                     }
                 });
                 return host;
             }
-            document.querySelector("#code").innerHTML = `CODE: ${solvedMsg.room.code}`;
-            document.querySelector("#acces").innerHTML = `ACCES: ${solvedMsg.room.acces ? "public" : "private"}`.toUpperCase();
-            document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.room.users.length}/${solvedMsg.room.slots}`;
+            document.querySelector("#code").innerHTML = `CODE: ${solvedMsg.code}`;
+            document.querySelector("#acces").innerHTML = `ACCES: ${solvedMsg.acces ? "public" : "private"}`.toUpperCase();
+            document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.users.length}/${solvedMsg.slots}`;
             document.querySelector("#host").innerHTML = `HOST: ${getHost().name}`;
-            realusr = solvedMsg.username;
-            roomCode = solvedMsg.room.code;
+            roomCode = solvedMsg.code;
             break;
         case "VALID_MSG":
             let node = document.createElement("p");  
             let msgNode = `${solvedMsg.username}: ${solvedMsg.text}`
             node.append(msgNode);
             document.querySelector("#history").append(node)
+            break;
+        case "PRIVATE_DATA":
+            realusr = msg.data;
             break;
         }
 

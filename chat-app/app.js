@@ -109,7 +109,7 @@ wsServer.on('connection', function(ws) {
                 users.get(tempUser.getId()).setWs(con);
                 let room = currentRooms.get(tempCode);
                 let usrArr = room.getUsers();
-
+                
                 const getCircularReplacer = function(){
                     const seen = new WeakSet();
                     return (key, value) => {
@@ -123,9 +123,9 @@ wsServer.on('connection', function(ws) {
                     };
                   };
 
-                // con.send(JSON.stringify(new Message("GET_DATA", room)));
+                con.send(JSON.stringify(new Message("PRIVATE_DATA", tempUser.getName())));
                 usrArr.forEach(e => {
-                    e.getWs().send(JSON.stringify(new Message("GET_DATA", {room: room, username: tempUser.getName()}), getCircularReplacer()));
+                    e.getWs().send(JSON.stringify(new Message("GET_DATA", room), getCircularReplacer()));
                 });
                 console.log("new id: " + tempUser.getWs().id);
                 break;
