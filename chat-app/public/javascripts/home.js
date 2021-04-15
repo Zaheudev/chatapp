@@ -14,63 +14,71 @@ joinRoomButton.addEventListener('click', (e) =>{
     if(dialogOpened === false){
         joinRoomDialog.style = "display: block;";
         dialogOpened = true;
-        let fields = joinRoomDialog.querySelectorAll("input");
-
-        joinRoomDialog.querySelector(".submitInput").addEventListener('click', (e) =>{
-            username = joinRoomDialog.querySelector(".usernameField").value;
-            code = joinRoomDialog.querySelector(".codeField").value;
-            client.send(JSON.stringify(new Message("askJoinRoom", {username: username, code: code})));
-        });
-        joinRoomDialog.querySelector(".backButton").addEventListener('click', (e) =>{
-            joinRoomDialog.style = "display: none;";
-            fields.forEach((e) => {
-                e.value = null;
-                dialogOpened = false;
-            });
-        });
     }
 });
+
+function jrF1(){
+    username = joinRoomDialog.querySelector(".usernameField").value;
+    code = joinRoomDialog.querySelector(".codeField").value;
+    client.send(JSON.stringify(new Message("askJoinRoom", {username: username, code: code})));
+}
+
+function jrF2(){
+    joinRoomDialog.style = "display: none;";
+    let fields = joinRoomDialog.querySelectorAll("input");
+    dialogOpened = false;
+    fields.forEach((e) => {
+        e.value = null;
+    });
+}
 
 joinRandomRoomButton.addEventListener('click', (e) =>{
     if(dialogOpened === false){
         joinRandomRoomDialog.style = "display: block;";
         dialogOpened = true;
-        let fields = joinRandomRoomDialog.querySelectorAll("input");
-
-        joinRandomRoomDialog.querySelector(".submitInput").addEventListener('click', (e) =>{
-            username = joinRandomRoomDialog.querySelector(".usernameField").value;
-            client.send(JSON.stringify(new Message("askJoinRandomRoom", {username: username})));
-        });
-
-        joinRandomRoomDialog.querySelector(".backButton").addEventListener('click', (e) =>{
-            joinRandomRoomDialog.style = "display: none;";
-            fields.forEach((e) => {
-                e.value = null;
-                dialogOpened = false;
-            });
-        });
     }
 });
+
+function jrrF1(){
+    username = joinRandomRoomDialog.querySelector(".usernameField").value;
+    client.send(JSON.stringify(new Message("askJoinRandomRoom", {username: username})));
+}
+
+function jrrF2(){
+    let fields = joinRandomRoomDialog.querySelectorAll("input");
+    joinRandomRoomDialog.style = "display: none;";
+    dialogOpened = false;
+    fields.forEach((e) => {
+        e.value = null;
+    });
+}
 
 let slots = null;
 createRoomButton.addEventListener('click', (e) =>{
     if(dialogOpened === false){
         dialogOpened = true;
         createRoomDialog.style = "display: block";
-        let fields = createRoomDialog.querySelectorAll("input");
-    
-        createRoomDialog.querySelector(".submitInput").addEventListener('click', (e) =>{
-            username = createRoomDialog.querySelector(".usernameField").value;
-            slots = createRoomDialog.querySelector(".slotsField").value;
-            acces = createRoomDialog.querySelector(".checkboxField").checked;
-            client.send(JSON.stringify(new Message("askCreateRoom", {username: username, slots: slots, acces: acces})));
-        });
-        createRoomDialog.querySelector(".backButton").addEventListener('click', (e) => {
-            createRoomDialog.style = "display: none";
-            fields.forEach((e) => {
-                e.value = null;
-                dialogOpened = false;
-            });
-        });
     }
 });
+
+function crcF1() {
+    username = createRoomDialog.querySelector(".usernameField").value;
+    slots = createRoomDialog.querySelector(".slotsField").value;
+    acces = createRoomDialog.querySelector(".checkboxField").checked;
+    client.send(JSON.stringify(new Message("askCreateRoom", {username: username, slots: slots, acces: acces})));
+}
+
+function crcF2() {
+    let fields = createRoomDialog.querySelectorAll("input");
+    dialogOpened = false;
+    createRoomDialog.style = "display: none";
+    fields.forEach((e) => {
+        if(e.className != "slotsField"){
+            e.value = null;
+        }
+    });
+}
+
+function removeSpaces(string) {
+    return string.split(' ').join('');
+}

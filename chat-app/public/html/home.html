@@ -17,13 +17,13 @@
         <section id="dialogs">
             <div id="createRoomDialog" style="display: none;">
                 <label for="usernameField">Username:</label><br>
-                <input class="usernameField" type="text"><br>
+                <input class="usernameField" onblur="this.value=removeSpaces(this.value);" maxlength="10" type="text"><br>
                 <label for="slotsField">Slots:</label><br>
-                <input class="slotsField" type="number" min="2"><br>
+                <input class="slotsField" type="number" value="2" min="2"><br>
                 <label for="checkboxField">Public:</label>
                 <input class="checkboxField" type="checkbox"><br>
-                <button class="submitInput" type="button">CREATE ROOM!</button>
-                <button type="button" class="backButton">BACK</button>
+                <button class="submitInput" onclick="crcF1()" type="button">CREATE ROOM!</button>
+                <button type="button" onclick="crcF2()" class="backButton">BACK</button>
             </div >
 
             <div id="createRoomValid" style="display: none;">
@@ -34,18 +34,18 @@
                         <p class="slots"></p>
                         <p class="acces"></p>
                     </div>
-                    <input class="Yes" type="submit" value="CREATE">
+                    <input class="Yes" type="button" onclick="submitData('createRoomCommand')"value="CREATE">
                     <input class="No" type="button" value="BACK">
                 </form>
             </div>
 
             <div id="joinRoomDialog" style="display: none;">
                 <label for="usernameField">Username:</label><br>
-                <input class="usernameField" type="text"><br>
+                <input class="usernameField" onblur="this.value=removeSpaces(this.value);" type="text"><br>
                 <label for="codeField">Code:</label><br>
-                <input class="codeField" type="text"><br>
-                <button class="submitInput" type="button">JOIN!</button>
-                <button type="button" class="backButton">BACK</button>
+                <input class="codeField" maxlength="6" onblur="this.value=removeSpaces(this.value);" type="text"><br>
+                <button class="submitInput" onclick="jrF1()" type="button">JOIN!</button>
+                <button type="button" onclick="jrF2()" class="backButton">BACK</button>
             </div>
             
             <div id="joinRoomValid" style="display: none;">
@@ -55,16 +55,16 @@
                         <p class="code"></p>
                         <p class="slots"></p>
                     </div>
-                    <input class="Yes" type="submit" value="JOIN">
+                    <input class="Yes" onclick="submitData('joinRoomCommand')" type="submit" value="JOIN">
                     <input class="No" type="button" value="BACK">
                 </form>
             </div>
 
             <div id="joinRandomRoomDialog" style="display: none;">
                 <label for="usernameField">Username:</label><br>
-                <input class="usernameField" type="text"><br>
-                <button class="submitInput" type="submit">JOIN!</button>
-                <button type="button" class="backButton">BACK</button>
+                <input class="usernameField" onblur="this.value=removeSpaces(this.value);" type="text"><br>
+                <button class="submitInput" onclick="jrrF1()" type="button">JOIN!</button>
+                <button type="button" onclick="jrrF2()" class="backButton">BACK</button>
             </div>
 
             <div id="joinRandomRoomValid" style="display: none;">
@@ -74,13 +74,14 @@
                         <p class="code"></p>
                         <p class="slots"></p>
                     </div>
-                    <input class="Yes" type="submit" value="join">
+                    <input class="Yes" onclick="submitData('joinRandomRoomCommand')" type="submit" value="join">
                     <input class="No" type="button" value="back">
                 </form>
             </div>
         </section>
 
     </body>
-    <script type="text/javascript" src="../javascripts/home.js"></script>
+    <script type="text/javascript" src="../javascripts/home.js">
+    </script>
     <script type="text/javascript" src="../javascripts/messageParser.js"></script>
 </html>

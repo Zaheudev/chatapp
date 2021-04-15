@@ -37,6 +37,7 @@ wsServer.on('connection', function(ws) {
     ws.on("message", function(message) {
         let clientMessage = JSON.parse(message);
         console.log(clientMessage.data);
+        console.log(clientMessage.type);
         let msg = clientMessage.data;
 
         switch(clientMessage.type){
@@ -92,7 +93,7 @@ wsServer.on('connection', function(ws) {
                 }
                 console.log("Room created with code " + newRoom.getCode() + ` and setted acces to ${newRoom.getAccesFormat()} ` 
                      + ", the host is " + newRoom.getHost().getName());
-                con.send(JSON.stringify(new Message("JOIN_CRC", newHost)));
+                con.send(JSON.stringify(new Message("JOIN_CRC", newHost), getCircularReplacer()));
 
                 break;
             case "joinRandomRoomCommand":
@@ -110,19 +111,6 @@ wsServer.on('connection', function(ws) {
                 let room = currentRooms.get(tempCode);
                 let usrArr = room.getUsers();
                 
-                const getCircularReplacer = function(){
-                    const seen = new WeakSet();
-                    return (key, value) => {
-                      if (typeof value === "object" && value !== null) {
-                        if (seen.has(value)) {
-                          return;
-                        }
-                        seen.add(value);
-                      }
-                      return value;
-                    };
-                  };
-
                 con.send(JSON.stringify(new Message("PRIVATE_DATA", tempUser.getName())));
                 usrArr.forEach(e => {
                     e.getWs().send(JSON.stringify(new Message("GET_DATA", room), getCircularReplacer()));
@@ -134,6 +122,9 @@ wsServer.on('connection', function(ws) {
                 arr.forEach(e => {
                     e.getWs().send(JSON.stringify(new Message("VALID_MSG", {text: msg.text, username: msg.from})));
                 });
+                break;
+            case "cancelled":
+                console.log("CANCEL");
                 break;
 
         }
@@ -167,6 +158,20 @@ function choiceRandomRoom(map){
     let result = map.get(codes[size]);
     return result;
 }
+
+function getCircularReplacer(){
+    const seen = new WeakSet();
+    return (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) {
+          return;
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+  };
+
 
 http.createServer(app).listen(port);
 console.log("Server started on port " + port);

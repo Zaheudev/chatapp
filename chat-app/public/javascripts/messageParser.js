@@ -8,6 +8,8 @@ function Message (type, data) {
 var realusr = null;
 var roomCode = null;
 
+var data = null;
+
 client.onmessage = function (event) {
     let msg = JSON.parse(event.data);
     resolveMsg(msg);
@@ -19,38 +21,41 @@ function resolveMsg(msg){
     let solvedMsg = msg.data;
     switch(msg.type){
         case "VALID_CRC":
-            console.log(msg.type);
             let createRoomValid = document.querySelector("#createRoomValid");
             dialogDisable(createRoomDialog, createRoomValid);
             createRoomValid.querySelector(".code").innerHTML = "Code: " + msg.data.code;
             createRoomValid.querySelector(".slots").innerHTML = "Slots: " + msg.data.slots;
             createRoomValid.querySelector(".acces").innerHTML = `Acces: ${msg.data.acces ? "public" : "private"}`;
-            addSubmitListener(createRoomValid, "createRoomCommand", msg.data);
+            data = msg.data;
+            addBackListener(createRoomValid);
             break;
         case "VALID_JRC":
-            console.log(msg.type);
             let joinRoomValid = document.querySelector("#joinRoomValid");
             dialogDisable(joinRoomDialog, joinRoomValid);
             joinRoomValid.querySelector(".code").innerHTML = "Code: " + msg.data.code;
             joinRoomValid.querySelector(".slots").innerHTML = "Slots: " + msg.data.slots;
-            addSubmitListener(joinRoomValid, "joinRoomCommand", msg.data);
+            data = msg.data;
+            addBackListener(joinRoomValid);
             break;
         case "VALID_JRRC":
-            console.log(msg.type);
             let joinRandomRoomValid = document.querySelector("#joinRandomRoomValid");
             dialogDisable(joinRandomRoomDialog, joinRandomRoomValid);
             joinRandomRoomValid.querySelector(".code").innerHTML = "Code: " + msg.data.code;
             joinRandomRoomValid.querySelector(".slots").innerHTML = "Slots: " + msg.data.slots;
-            addSubmitListener(joinRandomRoomValid, "joinRandomRoomCommand", msg.data);
+            data = msg.data;
+            addBackListener(joinRandomRoomValid);
             break;
         case "JOIN_JRC":
             console.log(msg.type);
+            document.querySelector("#joinRoomValid").querySelector("form").submit();
             break;
         case "JOIN_CRC":
             console.log(msg.type);
+            document.querySelector("#createRoomValid").querySelector("form").submit();
             break;
         case "JOIN_JRRC":
             console.log(msg.type);
+            document.querySelector("#joinRandomRoomValid").querySelector("form").submit();
             break;
         case "GET_DATA":
             const getHost = function(){
@@ -70,9 +75,9 @@ function resolveMsg(msg){
             break;
         case "VALID_MSG":
             let node = document.createElement("p");  
-            let msgNode = `${solvedMsg.username}: ${solvedMsg.text}`
+            let msgNode = `${solvedMsg.username === realusr ? "YOU" : solvedMsg.username}: ${solvedMsg.text}`
             node.append(msgNode);
-            document.querySelector("#history").append(node)
+            document.querySelector("#history").append(node);
             break;
         case "PRIVATE_DATA":
             realusr = msg.data;
@@ -81,9 +86,14 @@ function resolveMsg(msg){
 
 }
 
-function addSubmitListener(dialog, type, data){
-    dialog.querySelector(".Yes").addEventListener('click', (e) =>{
-        client.send(JSON.stringify(new Message(type, data)));
+function submitData(type){
+    client.send(JSON.stringify(new Message(type, data)));
+}
+
+function addBackListener(dialog){
+    dialog.querySelector(".No").addEventListener('click', (e) => {
+        dialog.style = "display: none;";
+        dialogOpened = false;
     });
 }
 
