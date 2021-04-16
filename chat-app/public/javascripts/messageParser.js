@@ -82,8 +82,16 @@ function resolveMsg(msg){
         case "PRIVATE_DATA":
             realusr = msg.data;
             break;
-        }
-
+        case "wrongCode":
+            alert("Wrong Code!");
+            break;
+        case "usernameTaken":
+            alert("Change your username before joining this room");
+            break;
+        case "noRooms":
+            alert("No rooms available. Create one by yourself and wait for users to connect! Or try change your username!");
+            break;
+    }
 }
 
 function submitData(type){

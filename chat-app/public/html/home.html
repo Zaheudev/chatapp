@@ -19,7 +19,7 @@
                 <label for="usernameField">Username:</label><br>
                 <input class="usernameField" onblur="this.value=removeSpaces(this.value);" maxlength="10" type="text"><br>
                 <label for="slotsField">Slots:</label><br>
-                <input class="slotsField" type="number" value="2" min="2"><br>
+                <input class="slotsField" onblur="this.value=fixCheckBox(this.value)" type="number" value="2" max="20" min="2"><br>
                 <label for="checkboxField">Public:</label>
                 <input class="checkboxField" type="checkbox"><br>
                 <button class="submitInput" onclick="crcF1()" type="button">CREATE ROOM!</button>

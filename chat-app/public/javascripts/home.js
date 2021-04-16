@@ -18,15 +18,20 @@ joinRoomButton.addEventListener('click', (e) =>{
 });
 
 function jrF1(){
+    let valid = false;
     username = joinRoomDialog.querySelector(".usernameField").value;
     code = joinRoomDialog.querySelector(".codeField").value;
-    client.send(JSON.stringify(new Message("askJoinRoom", {username: username, code: code})));
+    if(username === "" || code.length < 6) alert("Fill the fields before quering for room"); else valid = true;
+
+    if(valid){
+        client.send(JSON.stringify(new Message("askJoinRoom", {username: username, code: code})));
+    }
 }
 
 function jrF2(){
     joinRoomDialog.style = "display: none;";
-    let fields = joinRoomDialog.querySelectorAll("input");
     dialogOpened = false;
+    let fields = joinRoomDialog.querySelectorAll("input");
     fields.forEach((e) => {
         e.value = null;
     });
@@ -40,14 +45,20 @@ joinRandomRoomButton.addEventListener('click', (e) =>{
 });
 
 function jrrF1(){
+    let valid = false;
     username = joinRandomRoomDialog.querySelector(".usernameField").value;
-    client.send(JSON.stringify(new Message("askJoinRandomRoom", {username: username})));
+
+    if(username === "") alert("The username canno't be blank"); else valid = true;
+    
+    if(valid){
+        client.send(JSON.stringify(new Message("askJoinRandomRoom", {username: username})));
+    }
 }
 
 function jrrF2(){
-    let fields = joinRandomRoomDialog.querySelectorAll("input");
     joinRandomRoomDialog.style = "display: none;";
     dialogOpened = false;
+    let fields = joinRandomRoomDialog.querySelectorAll("input");
     fields.forEach((e) => {
         e.value = null;
     });
@@ -65,13 +76,16 @@ function crcF1() {
     username = createRoomDialog.querySelector(".usernameField").value;
     slots = createRoomDialog.querySelector(".slotsField").value;
     acces = createRoomDialog.querySelector(".checkboxField").checked;
-    client.send(JSON.stringify(new Message("askCreateRoom", {username: username, slots: slots, acces: acces})));
+    if(username === "") alert("The username can't be blank"); else valid = true;
+    if(valid){
+        client.send(JSON.stringify(new Message("askCreateRoom", {username: username, slots: slots, acces: acces})));
+    }
 }
 
 function crcF2() {
-    let fields = createRoomDialog.querySelectorAll("input");
     dialogOpened = false;
     createRoomDialog.style = "display: none";
+    let fields = createRoomDialog.querySelectorAll("input");
     fields.forEach((e) => {
         if(e.className != "slotsField"){
             e.value = null;
@@ -81,4 +95,14 @@ function crcF2() {
 
 function removeSpaces(string) {
     return string.split(' ').join('');
+}
+
+function fixCheckBox(number){
+    if(number === "" || number < 2){
+        return 2;
+    }else if(number > 20){
+        return 20;
+    }else{
+        return number;
+    }
 }
