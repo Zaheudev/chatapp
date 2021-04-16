@@ -21,6 +21,10 @@ function User(ws, name, id, roomId, role){
         return this.id;
     }
 
+    this.setId = function(id){
+        this.id = id;
+    }
+
     this.getRoomId = function(){
         return this.roomId;
     }

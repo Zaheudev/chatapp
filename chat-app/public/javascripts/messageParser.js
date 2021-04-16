@@ -79,6 +79,10 @@ function resolveMsg(msg){
             node.append(msgNode);
             document.querySelector("#history").append(node);
             break;
+        case "UserLeft":
+            document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.room.users.length}/${solvedMsg.room.slots}`;
+            alert(`User ${solvedMsg.username} left the room!`);
+            break;
         case "PRIVATE_DATA":
             realusr = msg.data;
             break;

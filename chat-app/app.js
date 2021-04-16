@@ -24,6 +24,7 @@ var connectionId = 0;
 var currentRooms = new Map();
 var publicRooms = new Map();
 var users = new Map();
+var roomIds = new Map();
 
 var tempCode = null;
 var tempUser = null;
@@ -83,7 +84,7 @@ wsServer.on('connection', function(ws) {
             case "joinRoomCommand":
                 let newUserjr = new User(con, msg.username, con.id, msg.code, "N/A");
                 currentRooms.get(msg.code).addUserToRoom(newUserjr);
-                users.set(newUserjr.getId(), newUserjr);
+                users.set(msg.code, newUserjr);
                 console.log("joined room with code: " + msg.code + " users: " + currentRooms.get(msg.code).getUsers().length);
                 console.log("remaining slots: " + currentRooms.get(msg.code).getAvailableSlots());
                 tempCode = msg.code;
@@ -93,7 +94,7 @@ wsServer.on('connection', function(ws) {
             case "createRoomCommand":
                 let newHost = new User(con, msg.username, con.id, msg.code, "host");
                 let newRoom = new Room(newHost, msg.slots, msg.code, msg.acces);
-                users.set(newHost.getId(), newHost)
+                users.set(msg.code, newHost)
                 currentRooms.set(newRoom.getCode(), newRoom);
                 tempCode = msg.code;
                 tempUser = newHost;
@@ -107,7 +108,7 @@ wsServer.on('connection', function(ws) {
             case "joinRandomRoomCommand":
                 let newUserjrr = new User(con, msg.username, con.id, msg.code, "N/A");
                 publicRooms.get(msg.code).addUserToRoom(newUserjrr);
-                users.set(newUserjrr.getId(), newUserjrr);
+                users.set(msg.code, newUserjrr);
                 tempCode = msg.code;
                 tempUser = newUserjrr;
                 con.send(JSON.stringify(new Message("JOIN_JRRC")));
@@ -115,7 +116,10 @@ wsServer.on('connection', function(ws) {
                 console.log("remaining slots: " + publicRooms.get(msg.code).getAvailableSlots());
                 break;
             case "joined":
-                users.get(tempUser.getId()).setWs(con);
+                users.get(tempUser.getRoomId()).setWs(con);
+                users.get(tempUser.getRoomId()).setId(con.id);
+                tempUser.setId(con.id);
+                roomIds.set(tempUser.getId(), tempUser);
                 let room = currentRooms.get(tempCode);
                 let usrArr = room.getUsers();
                 
@@ -134,12 +138,21 @@ wsServer.on('connection', function(ws) {
             case "cancelled":
                 console.log("CANCEL");
                 break;
-
         }
     });
 
     ws.on("close", function(code){
         console.log(con.id + " DISCONNECTED");
+
+        for(const [id, user] of roomIds){
+            if(id === con.id){
+                let room = currentRooms.get(user.getRoomId());
+                room.removeUser(user);
+                room.getUsers().forEach(e => {
+                    e.getWs().send(JSON.stringify(new Message("UserLeft", {room: room, username: user.getName()})));
+                });
+            }
+        }
     });
 
 });
