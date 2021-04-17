@@ -138,6 +138,11 @@ wsServer.on('connection', function(ws) {
             case "cancelled":
                 console.log("CANCEL");
                 break;
+            case "updateAcces":
+                let fromRoom = currentRooms.get(msg.code);
+                fromRoom.setAcces(msg.acces);
+                con.send(JSON.stringify(new Message("updatedAcces", fromRoom.getAcces())));
+                break;
         }
     });
 
@@ -149,7 +154,7 @@ wsServer.on('connection', function(ws) {
                 let room = currentRooms.get(user.getRoomId());
                 room.removeUser(user);
                 room.getUsers().forEach(e => {
-                    e.getWs().send(JSON.stringify(new Message("UserLeft", {room: room, username: user.getName()})));
+                    e.getWs().send(JSON.stringify(new Message("UserLeft", {room: room, username: user.getName()}), getCircularReplacer()));
                 });
             }
         }

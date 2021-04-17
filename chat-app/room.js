@@ -38,6 +38,10 @@ function Room(host, slots, code, acces){
         return this.host;
     }
 
+    this.setHost = function(host){
+        this.host = host;
+    }
+
     this.getSlots = function(){
         return this.slots;
     }

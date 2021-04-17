@@ -72,6 +72,8 @@ function resolveMsg(msg){
             document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.users.length}/${solvedMsg.slots}`;
             document.querySelector("#host").innerHTML = `HOST: ${getHost().name}`;
             roomCode = solvedMsg.code;
+            hostSettings(solvedMsg.users, realusr, roomCode);
+            updateUsersList(solvedMsg.users);
             break;
         case "VALID_MSG":
             let node = document.createElement("p");  
@@ -81,10 +83,14 @@ function resolveMsg(msg){
             break;
         case "UserLeft":
             document.querySelector("#users").innerHTML = `USERS: ${solvedMsg.room.users.length}/${solvedMsg.room.slots}`;
+            updateUsersList(solvedMsg.room.users);
             alert(`User ${solvedMsg.username} left the room!`);
             break;
         case "PRIVATE_DATA":
             realusr = msg.data;
+            break;
+        case "updatedAcces":
+            document.querySelector("#acces").innerHTML = `ACCES: ${solvedMsg ? "public" : "private"}`.toUpperCase();
             break;
         case "wrongCode":
             alert("Wrong Code!");
@@ -96,6 +102,40 @@ function resolveMsg(msg){
             alert("No rooms available. Create one by yourself and wait for users to connect! Or try change your username!");
             break;
     }
+}
+
+function hostSettings(arr, usr, code){
+    // how this works is temporary!!
+    arr.forEach(e =>{
+        if(e.role === "host"){
+            if(e.name === usr){
+                if(!document.body.contains(document.querySelector("#accesButton"))){
+                    let node = document.createElement("button");
+                    node.setAttribute('id','accesButton');
+                    node.innerHTML = "CHANGE ACCES";
+                    document.querySelector("#details").appendChild(node);
+                    node.addEventListener('click', (e) =>{
+                        let acces = document.querySelector("#acces").innerHTML
+                        let boolean = (acces.includes("PUBLIC")) ? false : true;
+                        client.send(JSON.stringify(new Message("updateAcces", {code: code, acces: boolean})))
+                    });
+                }
+            }
+        }
+    });
+}
+
+function updateUsersList(arr){
+    let div = document.createElement('div');
+    div.setAttribute('id', 'list');
+    arr.forEach(e => {
+        let node = document.createElement("h4");
+        node.innerHTML = e.name;
+        node.setAttribute('id', e.name);
+        div.append(node);
+    });
+    let section = document.querySelector("#listSection");
+    section.replaceChild(div ,document.querySelector("#list"));
 }
 
 function submitData(type){
