@@ -18,6 +18,14 @@ function Room(host, slots, code, acces){
         }
     }
 
+    this.getUser = function(name){
+        this.users.forEach(e => {
+            if(e.name === name){
+                return e;
+            }
+        });
+    }
+
     this.getAvailableSlots = function(){
         return this.getSlots() - this.getUsers().length;
     }

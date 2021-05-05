@@ -6,7 +6,7 @@ const path = require("path");
 
 const Room = require("./room.js");
 const User = require("./user.js");
-const Message = require("./message.js")
+const Message = require("./message.js");
 
 const port = process.argv[2];
 const app = express();  
@@ -42,6 +42,7 @@ wsServer.on('connection', function(ws) {
         let msg = clientMessage.data;
 
         switch(clientMessage.type){
+            // 'ask' cases are for processing data and asking the user if they really want to proceed that act
             case "askCreateRoom":
                 let code = makeCode(6);
                 con.send(JSON.stringify(new Message("VALID_CRC", {username: msg.username, code: code, slots: msg.slots, acces: msg.acces})));
@@ -68,6 +69,14 @@ wsServer.on('connection', function(ws) {
                 }
                 break;
             case "askJoinRandomRoom":
+                //deletes every item from room to assign new ones
+                publicRooms.clear();
+                for(const [code, room] of currentRooms){
+                    if(room.acces){
+                        //assigning new items to map
+                        publicRooms.set(code, room);
+                    }
+                }
                 if(publicRooms.size != 0){
                     let randRoom = choiceRandomRoom(publicRooms, msg.username);
                     if(randRoom != null){
@@ -81,6 +90,7 @@ wsServer.on('connection', function(ws) {
                     con.send(JSON.stringify(new Message("noRooms")));
                 }
                 break;
+                //cases like joinRoomCommand, createRoomCommand and joinRandomRoomCommand are running after user agreed an ask case
             case "joinRoomCommand":
                 let newUserjr = new User(con, msg.username, con.id, msg.code, "N/A");
                 currentRooms.get(msg.code).addUserToRoom(newUserjr);
@@ -98,9 +108,6 @@ wsServer.on('connection', function(ws) {
                 currentRooms.set(newRoom.getCode(), newRoom);
                 tempCode = msg.code;
                 tempUser = newHost;
-                if(msg.acces){
-                    publicRooms.set(newRoom.code, newRoom);
-                }
                 console.log("Room created with code " + newRoom.getCode() + ` and setted acces to ${newRoom.getAccesFormat()} ` 
                      + ", the host is " + newRoom.getHost().getName());
                 con.send(JSON.stringify(new Message("JOIN_CRC", newHost), getCircularReplacer()));
@@ -116,6 +123,7 @@ wsServer.on('connection', function(ws) {
                 console.log("remaining slots: " + publicRooms.get(msg.code).getAvailableSlots());
                 break;
             case "joined":
+                //this case is getting from roomPage after the new WebSocket is loaded and means a player joined a certain room
                 users.get(tempUser.getRoomId()).setWs(con);
                 users.get(tempUser.getRoomId()).setId(con.id);
                 tempUser.setId(con.id);
@@ -130,18 +138,53 @@ wsServer.on('connection', function(ws) {
                 console.log("new id: " + tempUser.getWs().id);
                 break;
             case "MESSAGE":
+                //this case is for when a player sends a text message in chat room
                 let arr = currentRooms.get(msg.code).getUsers();
                 arr.forEach(e => {
                     e.getWs().send(JSON.stringify(new Message("VALID_MSG", {text: msg.text, username: msg.from})));
                 });
                 break;
-            case "cancelled":
-                console.log("CANCEL");
-                break;
             case "updateAcces":
-                let fromRoom = currentRooms.get(msg.code);
-                fromRoom.setAcces(msg.acces);
-                con.send(JSON.stringify(new Message("updatedAcces", fromRoom.getAcces())));
+                //this case is getting from the host WebSocket of the room and updates the acces of the room (part of the setting of the room) and updates to all users
+                let usersArr = currentRooms.get(msg.code).getUsers();
+                currentRooms.get(msg.code).setAcces(msg.acces);
+                usersArr.forEach(e => {
+                    if(e.getId() === currentRooms.get(msg.code).getHost().getId()){
+                        usersArr.forEach(e => {
+                            e.getWs().send(JSON.stringify(new Message("updatedAcces", currentRooms.get(msg.code).getAcces())));
+                        });
+                    }
+                });
+                break;
+            case "GiveHost":
+                let arr2 = currentRooms.get(msg.room).getUsers();
+
+                arr2.forEach(e => {
+                    if(e.name === msg.to.name){
+                        currentRooms.get(msg.room).getHost().setRole("N/A");
+                        e.setRole("host");
+                        currentRooms.get(msg.room).setHost(e);
+                        e.getWs().send(JSON.stringify(new Message('HOST', currentRooms.get(msg.room)), getCircularReplacer()));
+                        arr2.forEach(e => {
+                            e.getWs().send(JSON.stringify(new Message("NewHost", currentRooms.get(msg.room)), getCircularReplacer()));
+                        });
+                    }
+                });
+                break;
+            case "deleteRoom":
+                let host = currentRooms.get(msg.code).getHost();
+                currentRooms.get(msg.code).getUsers().forEach(e => {
+                    if(e.getId() === host.getId()){
+                        if(e.getRole() === "host"){
+                            currentRooms.get(msg.code).getUsers().forEach(e => {
+                                e.getWs().send(JSON.stringify(new Message("deleteRoom", msg.data)));
+                                if(currentRooms.get(msg.code).getUsers() < 1){
+                                    currentRooms.delete(msg.code);
+                                }
+                            });
+                        }
+                    }
+                });
                 break;
         }
     });
@@ -151,11 +194,28 @@ wsServer.on('connection', function(ws) {
 
         for(const [id, user] of roomIds){
             if(id === con.id){
+                //this for loop is used to check if the ws who got disconnected is from a roomPage and not from homePage
                 let room = currentRooms.get(user.getRoomId());
-                room.removeUser(user);
-                room.getUsers().forEach(e => {
-                    e.getWs().send(JSON.stringify(new Message("UserLeft", {room: room, username: user.getName()}), getCircularReplacer()));
-                });
+                if(room != null){
+                    room.removeUser(user);
+                    if(room.getUsers().length === 0){
+                        currentRooms.delete(user.getRoomId());
+                    }else{
+                        if(user.role === "host"){
+                            //assigning a new host and sending a message to it!
+                            let newHost = changeHost(true, currentRooms.get(user.getRoomId()).getHost());
+                            newHost.getWs().send(JSON.stringify(new Message("HOST", currentRooms.get(user.getRoomId())), getCircularReplacer()));
+                            currentRooms.get(user.getRoomId()).getUsers().forEach(e => {
+                                //sending message to all users from the room to update the host!
+                                e.getWs().send(JSON.stringify(new Message("NewHost", currentRooms.get(user.getRoomId())), getCircularReplacer()));
+                            });
+                        }
+                    }
+                    room.getUsers().forEach(e => {
+                        //sends the message "UserLeft" to all websockets connected to the room of the leaver to update the room for everyone
+                        e.getWs().send(JSON.stringify(new Message("UserLeft", {room: room, username: user.getName()}), getCircularReplacer()));
+                    });
+                }
             }
         }
     });
@@ -195,6 +255,27 @@ function checkForUsername(name, roomcode){
         }
     });
     return valid;
+}
+
+function changeHost(random, oldHost, newHost){
+    if(random){
+        //if random parameter is true then sets the host to a random user connected (used when the host disconnects)
+        let room = currentRooms.get(oldHost.getRoomId());
+        let size = Math.floor(Math.random() * room.getUsers().length);
+        let result = room.users[size];
+        result.setRole("host");
+        room.setHost(result);
+        return result;
+    }else{
+        //if random parameter is false then sets the host to 'newHost' user (used when oldhost wants to parse the host to a user of his choice)
+        if(newHost != null){
+            let room1 = currentRooms.get(oldHost.getRoomId()); 
+            room1.getUser(oldHost.name).setRole("N/A");
+            room1.getUser(newHost.name).setRole("host");
+            currentRooms.get(oldHost.getRoomId()).setHost(newHost);
+            return room1.getUser(newHost.name);
+        }
+    }
 }
 
 function getCircularReplacer(){
