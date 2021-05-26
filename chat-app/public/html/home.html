@@ -8,80 +8,80 @@
         <h1>CHAT APP</h1>        
     </header>
     <body>
-        <section id="menu">
-            <button id="joinRoomButton">JOIN ROOM</button>
-            <button id="joinRandomRoomButton">JOIN RANDOM ROOM</button>
-            <button id="createRoomButton">CREATE ROOM</button>
-        </section>
+        <main>
+            <section id="menu">
+                <button id="joinRoomButton">JOIN ROOM</button>
+                <button id="joinRandomRoomButton">JOIN RANDOM ROOM</button>
+                <button id="createRoomButton">CREATE ROOM</button>
+            </section>
 
-        <section id="dialogs">
-            <div id="createRoomDialog" style="display: none;">
-                <label for="usernameField">Username:</label><br>
-                <input class="usernameField" onblur="this.value=removeSpaces(this.value);" maxlength="10" type="text"><br>
-                <label for="slotsField">Slots:</label><br>
-                <input class="slotsField" onblur="this.value=fixCheckBox(this.value)" type="number" value="2" max="20" min="2"><br>
-                <label for="checkboxField">Public:</label>
-                <input class="checkboxField" type="checkbox"><br>
-                <button class="submitInput" onclick="crcF1()" type="button">CREATE ROOM!</button>
-                <button type="button" onclick="crcF2()" class="backButton">BACK</button>
-            </div >
+            <section id="dialogs">
+                <div id="createRoomDialog" style="display: none;">
+                    <label for="usernameField">Username:</label><br>
+                    <input class="usernameField" onblur="this.value=removeSpaces(this.value);" maxlength="10" type="text"><br>
+                    <label for="slotsField">Slots:</label><br>
+                    <input class="slotsField" onblur="this.value=fixCheckBox(this.value)" type="number" value="2" max="20" min="2"><br>
+                    <label for="checkboxField">Public:</label>
+                    <input class="checkboxField" type="checkbox"><br>
+                    <button class="submitInput" onclick="crcF1()" type="button">CREATE ROOM!</button>
+                    <button type="button" onclick="crcF2()" class="backButton">BACK</button>
+                </div >
 
-            <div id="createRoomValid" style="display: none;">
-                <form action="/room" method="GET">
-                    <label for="details">Details of the room that will be created:</label><br>
-                    <div id="details">
-                        <p class="code"></p>
-                        <p class="slots"></p>
-                        <p class="acces"></p>
-                    </div>
-                    <input class="Yes" type="button" onclick="submitData('createRoomCommand')"value="CREATE">
-                    <input class="No" type="button" value="BACK">
-                </form>
-            </div>
+                <div id="createRoomValid" style="display: none;">
+                    <form action="/room" method="GET">
+                        <label for="details">Details of the room that will be created:</label><br>
+                        <div id="details">
+                            <p class="code"></p>
+                            <p class="slots"></p>
+                            <p class="acces"></p>
+                        </div>
+                        <input class="Yes" type="button" onclick="submitData('createRoomCommand')"value="CREATE">
+                        <input class="No" type="button" value="BACK">
+                    </form>
+                </div>
 
-            <div id="joinRoomDialog" style="display: none;">
-                <label for="usernameField">Username:</label><br>
-                <input class="usernameField" onblur="this.value=removeSpaces(this.value);" type="text"><br>
-                <label for="codeField">Code:</label><br>
-                <input class="codeField" maxlength="6" onblur="this.value=removeSpaces(this.value);" type="text"><br>
-                <button class="submitInput" onclick="jrF1()" type="button">JOIN!</button>
-                <button type="button" onclick="jrF2()" class="backButton">BACK</button>
-            </div>
-            
-            <div id="joinRoomValid" style="display: none;">
-                <form action="/room" method="GET">
-                    <label for="details">Details of the room:</label><br>
-                    <div id="details">
-                        <p class="code"></p>
-                        <p class="slots"></p>
-                    </div>
-                    <input class="Yes" onclick="submitData('joinRoomCommand')" type="submit" value="JOIN">
-                    <input class="No" type="button" value="BACK">
-                </form>
-            </div>
+                <div id="joinRoomDialog" style="display: none;">
+                    <label for="usernameField">Username:</label><br>
+                    <input class="usernameField" onblur="this.value=removeSpaces(this.value);" type="text"><br>
+                    <label for="codeField">Code:</label><br>
+                    <input class="codeField" maxlength="6" onblur="this.value=removeSpaces(this.value);" type="text"><br>
+                    <button class="submitInput" onclick="jrF1()" type="button">JOIN!</button>
+                    <button type="button" onclick="jrF2()" class="backButton">BACK</button>
+                </div>
+                
+                <div id="joinRoomValid" style="display: none;">
+                    <form action="/room" method="GET">
+                        <label for="details">Details of the room:</label><br>
+                        <div id="details">
+                            <p class="code"></p>
+                            <p class="slots"></p>
+                        </div>
+                        <input class="Yes" onclick="submitData('joinRoomCommand')" type="submit" value="JOIN">
+                        <input class="No" type="button" value="BACK">
+                    </form>
+                </div>
 
-            <div id="joinRandomRoomDialog" style="display: none;">
-                <label for="usernameField">Username:</label><br>
-                <input class="usernameField" onblur="this.value=removeSpaces(this.value);" type="text"><br>
-                <button class="submitInput" onclick="jrrF1()" type="button">JOIN!</button>
-                <button type="button" onclick="jrrF2()" class="backButton">BACK</button>
-            </div>
+                <div id="joinRandomRoomDialog" style="display: none;">
+                    <label for="usernameField">Username:</label><br>
+                    <input class="usernameField" onblur="this.value=removeSpaces(this.value);" type="text"><br>
+                    <button class="submitInput" onclick="jrrF1()" type="button">JOIN!</button>
+                    <button type="button" onclick="jrrF2()" class="backButton">BACK</button>
+                </div>
 
-            <div id="joinRandomRoomValid" style="display: none;">
-                <form action="/room" method="GET">
-                    <label for="details">Details of Room:</label><br>
-                    <div id="details">
-                        <p class="code"></p>
-                        <p class="slots"></p>
-                    </div>
-                    <input class="Yes" onclick="submitData('joinRandomRoomCommand')" type="submit" value="join">
-                    <input class="No" type="button" value="back">
-                </form>
-            </div>
-        </section>
-
+                <div id="joinRandomRoomValid" style="display: none;">
+                    <form action="/room" method="GET">
+                        <label for="details">Details of Room:</label><br>
+                        <div id="details">
+                            <p class="code"></p>
+                            <p class="slots"></p>
+                        </div>
+                        <input class="Yes" onclick="submitData('joinRandomRoomCommand')" type="submit" value="join">
+                        <input class="No" type="button" value="back">
+                    </form>
+                </div>
+            </section>
+        </main>
     </body>
-    <script type="text/javascript" src="../javascripts/home.js">
-    </script>
+    <script type="text/javascript" src="../javascripts/home.js"></script>
     <script type="text/javascript" src="../javascripts/messageParser.js"></script>
 </html>
