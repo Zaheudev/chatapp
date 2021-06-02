@@ -74,6 +74,8 @@ function resolveMsg(msg){
             let msgNode = `${solvedMsg.username === realusr ? "YOU" : solvedMsg.username}: ${solvedMsg.text}`
             node.append(msgNode);
             document.querySelector("#history").append(node);
+            let objDiv = document.querySelector("#history");
+            objDiv.scrollTop = objDiv.scrollHeight - objDiv.clientHeight;
             break;
         case "HOST":
             hostSettings(solvedMsg.users, getHost(solvedMsg.users).name, solvedMsg.code);

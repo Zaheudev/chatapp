@@ -47,7 +47,7 @@ input[type=checkbox] {
     color: #ADEFD1FF;
 }
 
-input[type=button]{
+input[type=button], input[type=submit]{
     border-radius: 10px;
     font-family: Arial Narrow, sans-serif;
     font-size: large;

@@ -1,16 +1,51 @@
+body{
+    background-color:  #00203FFF;
+    color: #ADEFD1FF;
+    font-family: Arial Narrow, sans-serif;
+}
+
+input[type=button], input[type=submit]{
+    border-radius: 10px;
+    margin-top: 10px;
+    font-family: Arial Narrow, sans-serif;
+    font-size: large;
+    background-color:#ADEFD1FF;
+}
+
+input[type=text]{
+    border-radius: 6px;
+    background-color: #ADEFD1FF;
+    color: #00203FFF;
+    font-size: 1em;
+}
+
+#listSection button{
+    margin-left: 10px;
+}
+
+button {
+    border-radius: 10px;
+    font-family: Arial Narrow, sans-serif;
+    font-size: large;
+    background-color:#ADEFD1FF;
+}
+
 #sendMessage{
     top: 40em;
     right:50em;
 }
 
-#history{
-    right:50em;
-    top:20em;
+#history p{
+    margin-right: 10px;
 }
 
-body{
-    background-color: black;
-    color: white;
+#history{
+    width: 10em;
+    height: 10em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    margin-right: 0px;
 }
 
 #chat{
@@ -19,6 +54,6 @@ body{
     bottom: 50%;
     right:50%;
     border: 1em;
-    border-color:indianred;
+    border-color:#ADEFD1FF;
     border-style:groove;
 }
